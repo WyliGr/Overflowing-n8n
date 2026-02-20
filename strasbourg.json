@@ -1,0 +1,487 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        288,
+        -400
+      ],
+      "id": "d88dcbb3-fe23-4793-8483-c82b476cba7a",
+      "name": "Date & Time"
+    },
+    {
+      "parameters": {
+        "operation": "formatDate",
+        "date": "={{ $json.currentDate }}",
+        "format": "yyyy-MM-dd",
+        "outputFieldName": "formatted-url",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        288,
+        -176
+      ],
+      "id": "cb79d215-0232-4809-9943-b6f1a6c115c6",
+      "name": "Formating"
+    },
+    {
+      "parameters": {
+        "jsCode": "const baseUrl = \"https://www.allocine.fr/_/showtimes/theater-P0963/d-\";\nconst formattedDate = $input.first().json['formatted-url']\nreturn [{\n  json: {\n    UGCUrl: baseUrl + formattedDate\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        -464
+      ],
+      "id": "63f4cd46-59b1-4a05-88b2-6d220de8e058",
+      "name": "UGC Link Builder"
+    },
+    {
+      "parameters": {
+        "jsCode": "const baseUrl = \"https://www.allocine.fr/_/showtimes/theater-P0026/d-\";\nconst formattedDate = $input.first().json['formatted-url']\nreturn [{\n  json: {\n    CosmosURL: baseUrl + formattedDate\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        512,
+        -320
+      ],
+      "id": "7701a636-41f6-4eb2-b300-0ad5195a11a2",
+      "name": "Cosmos Link Builder"
+    },
+    {
+      "parameters": {
+        "jsCode": "const baseUrl = \"https://www.allocine.fr/_/showtimes/theater-P0600/d-\";\nconst formattedDate = $input.first().json['formatted-url']\nreturn [{\n  json: {\n    VoxURL: baseUrl + formattedDate\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        -176
+      ],
+      "id": "2c16968f-c797-4d31-8bde-80769d50b07a",
+      "name": "Vox Link Builder"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.UGCUrl }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        704,
+        -464
+      ],
+      "id": "ed023cbd-a723-4bb5-8643-e3b18b5f9fdb",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.CosmosURL }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        672,
+        -320
+      ],
+      "id": "c8166eae-3688-4ea1-a80f-909932fb2c47",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.VoxURL }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        624,
+        -176
+      ],
+      "id": "a5e9d53a-71ad-4cb1-845b-d52dd845c279",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        80,
+        -224
+      ],
+      "id": "ff6180cf-977e-4330-8d23-a910791e2039",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "jsCode": "const results = $input.first().json.results || [];\nconst nomDuCinema = \"UGC Ciné Cité\"; // À changer en \"Vox\" ou \"Le Cosmos\" selon le nœud\n\nconst simplifiedData = results\n  .filter(item => item.showtimes?.multiple?.length > 0) // On vire les films sans séances\n  .map(item => {\n    return {\n      titre: item.movie.title,\n      duree: item.movie.runtime,\n      horaires: item.showtimes.multiple.map(s => {\n        const date = new Date(s.startsAt);\n        return date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });\n      }).join(' | ')\n    };\n  });\n\nreturn [{ json: { cinema: nomDuCinema, films: simplifiedData } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        864,
+        -464
+      ],
+      "id": "2da95d31-9f09-4913-8682-2e3386531c7f",
+      "name": "Simplify JSON"
+    },
+    {
+      "parameters": {
+        "jsCode": "const results = $input.first().json.results || [];\nconst nomDuCinema = \"Le Cosmos\"; // À changer en \"Vox\" ou \"Le Cosmos\" selon le nœud\n\nconst simplifiedData = results\n  .filter(item => item.showtimes?.multiple?.length > 0) // On vire les films sans séances\n  .map(item => {\n    return {\n      titre: item.movie.title,\n      duree: item.movie.runtime,\n      horaires: item.showtimes.multiple.map(s => {\n        const date = new Date(s.startsAt);\n        return date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });\n      }).join(' | ')\n    };\n  });\n\nreturn [{ json: { cinema: nomDuCinema, films: simplifiedData } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        832,
+        -320
+      ],
+      "id": "8ecad8b3-1da5-4dc4-a55a-c6e6a83333b0",
+      "name": "Simplify JSON1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const results = $input.first().json.results || [];\nconst nomDuCinema = \"Vox\"; // À changer en \"Vox\" ou \"Le Cosmos\" selon le nœud\n\nconst simplifiedData = results\n  .filter(item => item.showtimes?.multiple?.length > 0) // On vire les films sans séances\n  .map(item => {\n    return {\n      titre: item.movie.title,\n      duree: item.movie.runtime,\n      horaires: item.showtimes.multiple.map(s => {\n        const date = new Date(s.startsAt);\n        return date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });\n      }).join(' | ')\n    };\n  });\n\nreturn [{ json: { cinema: nomDuCinema, films: simplifiedData } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        -176
+      ],
+      "id": "cd973259-bc1b-42c1-b58f-551628dc95d5",
+      "name": "Simplify JSON2"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 7
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        80,
+        -400
+      ],
+      "id": "5df19ff7-cd10-4863-8201-76eaeae495f3",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Tu es un bot Discord minimaliste. Ta mission est de mettre en forme la liste de films suivante de manière compacte et élégante : {{ JSON.stringify($json.liste_films) }}\n\n### CONSIGNE DE FORMATAGE STRICTE :\n\nPour chaque film, utilise exactement ce schéma :\n\n**TITRE DU FILM** (Durée)\n• **Vox** : Horaires\n• **UGC** : Horaires\n• **Le Cosmos** : Horaires\n\n---\n\n### RÈGLES DE STYLE :\n1. N'affiche QUE les cinémas qui ont des séances (si c'est \"Pas de séance\", supprime la ligne).\n2. N'utilise PAS de titres de section (type ###) ou de séparateurs horizontaux (---).\n3. Utilise une puce simple (•) pour les cinémas.\n4. Écris le titre du film en GRAS et MAJUSCULES.\n5. AUCUNE introduction, AUCUNE conclusion. Juste les films.\n6. Tu as le droit aux emojis, sans abus, reste minimaliste.\n7. Au début de CHAQUE message, mets un GRAND TITRE avec la date pour séparer le message actuel et le message du jour précédent.\n8. N'écris RIEN D'AUTRE que le message discord. RIEN",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1344,
+        -432
+      ],
+      "id": "971d5663-fa46-4a33-85ad-2bfbb58eff75",
+      "name": "AI Agent",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1470745724278018128",
+          "mode": "list",
+          "cachedResultName": "Better Will's Hub",
+          "cachedResultUrl": "https://discord.com/channels/1470745724278018128"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1474045417741353003",
+          "mode": "list",
+          "cachedResultName": "📽️-cinema",
+          "cachedResultUrl": "https://discord.com/channels/1470745724278018128/1474045417741353003"
+        },
+        "content": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        1632,
+        -432
+      ],
+      "id": "c88bde73-b029-4ecb-aece-f3b704c21792",
+      "name": "Send a message",
+      "webhookId": "39195e2f-43a6-4496-85c7-ae8e9cf4ee9f",
+      "executeOnce": false,
+      "credentials": {
+        "discordBotApi": {
+          "id": "imHvVLZiMf9y8yS9",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "mistral-large-latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "typeVersion": 1,
+      "position": [
+        1344,
+        -240
+      ],
+      "id": "eb175b99-4126-4526-a33c-524e6dc12915",
+      "name": "Mistral Cloud Chat Model",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "vJOMgRiygzhpyiDK",
+          "name": "Mistral Cloud account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const allInputs = $input.all();\nconst moviesMap = {};\n\nallInputs.forEach(input => {\n  const cinemaName = input.json.cinema;\n  const films = input.json.films || [];\n\n  films.forEach(film => {\n    const title = film.titre;\n    \n    if (!moviesMap[title]) {\n      moviesMap[title] = {\n        titre: title,\n        duree: film.duree,\n        seances: { \"Vox\": \"Pas de séance\", \"UGC\": \"Pas de séance\", \"Cosmos\": \"Pas de séance\" }\n      };\n    }\n    \n    // On remplit le bon cinéma (petit check sur le nom)\n    if (cinemaName.includes(\"Vox\")) moviesMap[title].seances[\"Vox\"] = film.horaires;\n    if (cinemaName.includes(\"UGC\")) moviesMap[title].seances[\"UGC\"] = film.horaires;\n    if (cinemaName.includes(\"Cosmos\")) moviesMap[title].seances[\"Cosmos\"] = film.horaires;\n  });\n});\n\nreturn [{ json: { liste_films: Object.values(moviesMap) } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1184,
+        -432
+      ],
+      "id": "80682968-b9df-4cee-95f4-b8cf3b9ea389",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1040,
+        -448
+      ],
+      "id": "e98a21aa-e007-4d9d-9337-df2534b1afa3",
+      "name": "Merge"
+    }
+  ],
+  "connections": {
+    "Date & Time": {
+      "main": [
+        [
+          {
+            "node": "Formating",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formating": {
+      "main": [
+        [
+          {
+            "node": "UGC Link Builder",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Cosmos Link Builder",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Vox Link Builder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "UGC Link Builder": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cosmos Link Builder": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vox Link Builder": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Simplify JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Simplify JSON1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Simplify JSON2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Date & Time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simplify JSON": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simplify JSON1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Simplify JSON2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Date & Time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mistral Cloud Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ccebdee6e9d1b884e63444dd87dc3a351b76671b8a2739e79e16b4b1ce7589ba"
+  }
+}
