@@ -1,0 +1,40 @@
+# 🥨 Strasbourg Theater Movies Parser
+
+Ce workflow **n8n** récupère quotidiennement les séances des cinémas strasbourgeois via l'API Allociné, les traite via une IA (Mistral) et publie un condensé élégant sur **Discord**.
+
+## 📍 Cinémas Inclus
+
+Le workflow est pré-configuré pour les salles suivantes :
+
+* **UGC Ciné Cité Rivétoile** (P0963)
+* **Le Cosmos** (P0026)
+* **Cinéma Vox** (P0600)
+
+## ⚙️ Fonctionnement
+
+1. **Extraction** : Récupération des données JSON brutes pour chaque cinéma.
+2. **Traitement** : Nettoyage des données en JavaScript pour ne garder que l'essentiel (Titres, Durées, Horaires).
+3. **Intelligence Artificielle** : Utilisation d'un agent **Mistral AI** pour reformater le texte de manière humaine et esthétique.
+4. **Notification** : Envoi du message final sur un salon Discord dédié.
+
+## 🚀 Installation
+
+1. **Import** : Copiez le contenu de `strasbourg.json` et collez-le dans votre instance n8n.
+2. **Credentials** :
+* Configurez vos identifiants **Mistral Cloud** dans le nœud *Mistral Cloud Chat Model*.
+* Connectez votre **Discord Bot** dans le nœud *Send a message*.
+
+
+3. **Personnalisation** (Optionnel) :
+* Par défaut, le message est envoyé chaque matin à **7h00**. Modifiez le nœud *Schedule Trigger* pour changer l'heure.
+* L'ID du salon Discord est déjà renseigné mais a modifier à votre convenance, assurez-vous que votre bot a les permissions d'écriture sur votre serveur.
+
+
+
+## 📝 Exemple de rendu Discord
+
+> **VENDREDI 27 FÉVRIER**
+> **DUNE: DEUXIÈME PARTIE** (2h46)
+> • **Vox** : 14:00 | 20:30
+> • **UGC** : 13:30 | 17:00 | 21:00
+> • **Le Cosmos** : 18:15
