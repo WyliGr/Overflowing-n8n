@@ -35,7 +35,6 @@ Le workflow est pré-configuré pour les salles suivantes :
 
 ## 📝 Exemple de rendu Discord
 
-> **VENDREDI 27 FÉVRIER**<br>
 > **DUNE: DEUXIÈME PARTIE** (2h46)<br>
 > • **Vox** : 14:00 (VO)| 20:30<br>
 > • **UGC** : 13:30 | 17:00 (VOSTFR)| 21:00<br>
