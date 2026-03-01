@@ -9,6 +9,8 @@ Le workflow est pré-configuré pour les salles suivantes :
 * **UGC Ciné Cité Rivétoile** (P0963)
 * **Le Cosmos** (P0026)
 * **Cinéma Vox** (P0600)
+* **Star** (P0027)
+* **Star Saint-Exupéry** (P0025)
 
 ## ⚙️ Fonctionnement
 
@@ -33,8 +35,8 @@ Le workflow est pré-configuré pour les salles suivantes :
 
 ## 📝 Exemple de rendu Discord
 
-> **VENDREDI 27 FÉVRIER**
-> **DUNE: DEUXIÈME PARTIE** (2h46)
-> • **Vox** : 14:00 | 20:30
-> • **UGC** : 13:30 | 17:00 | 21:00
-> • **Le Cosmos** : 18:15
+> **VENDREDI 27 FÉVRIER**<br>
+> **DUNE: DEUXIÈME PARTIE** (2h46)<br>
+> • **Vox** : 14:00 (VO)| 20:30<br>
+> • **UGC** : 13:30 | 17:00 (VOSTFR)| 21:00<br>
+> • **Le Cosmos** : 18:15<br>
