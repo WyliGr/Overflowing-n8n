@@ -1,40 +1,40 @@
 # 🚀 Overflowing-n8n
 
-Bienvenue dans ma bibliothèque personnelle de workflows **n8n**. Ce dépôt centralise différents automates conçus pour simplifier le quotidien, agréger des données ou connecter des services entre eux.
+This repository is my personal **n8n** workflow library. It centralizes various automations designed to simplify my everyday life, aggregate data, or connect services together. If it's useful for me, it can be useful for someone else.
 
-Chaque dossier contient un workflow spécifique avec son propre fichier JSON et sa documentation dédiée.
+Each folder contains a specific workflow with its own JSON file and dedicated documentation.
 
 ---
 
-## 📂 Sommaire des Workflows
+## 📂 Workflow Summary
 
-| Dossier | Description | Statut |
+| Folder | Description | Status |
 | --- | --- | --- |
-| **[Strasbourg Theater](https://www.google.com/search?q=./strasbourg)** | Scraper de scéances de cinémas (Vox, UGC, Cosmos) + IA + Discord. | ✅ Stable |
-| *À venir...* | *Nouveaux automates en cours de développement.* | 🚧 |
+| **[Strasbourg Theater](https://www.google.com/search?q=./strasbourg)** | Movie showtimes scraper (Vox, UGC, Cosmos, ...) + AI + Discord. | ✅ Stable |
+| *Coming soon...* | *New automations currently in development.* | 🚧 |
 
 ---
 
-## 🛠️ Installation Générale
+## 🛠️ General Installation
 
-Pour utiliser l'un de ces workflows dans votre instance n8n :
+To use any of these workflows in your n8n instance:
 
-1. **Naviguez** dans le dossier du workflow qui vous intéresse.
-2. **Copiez** le contenu du fichier `.json`.
-3. **Collez** directement dans l'interface de votre éditeur n8n.
-4. **Configurez les Credentials** : La plupart des workflows utilisent des API tierces (Mistral, Discord, etc.). Vous devrez lier vos propres comptes dans les nœuds correspondants.
-
----
-
-## 🤖 Pourquoi utiliser ces workflows ?
-
-* **Prêts à l'emploi** : Pas besoin de reconstruire la logique de zéro.
-* **Optimisés** : Utilisation de code JavaScript minimal et d'IA quand c'est pertinent pour le formatage.
-* **Modulaires** : Faciles à adapter pour d'autres villes ou d'autres plateformes de messagerie (Telegram, Slack, etc.).
+1. **Navigate** to the workflow folder you are interested in.
+2. **Copy** the content of the `.json` file.
+3. **Paste** it directly into your n8n editor interface.
+4. **Configure the Credentials**: Most workflows use third-party APIs (Mistral, Discord, etc.). You will need to link your own accounts in the corresponding nodes.
 
 ---
 
-## 🔧 Prérequis
+## 🤖 Why use these workflows?
 
-* Une instance **n8n** (Cloud ou auto-hébergée).
-* Les credentials spécifiques mentionnés dans le README de chaque dossier.
+* **Ready to use**: No need to rebuild the logic from scratch.
+* **Optimized**: Uses minimal JavaScript code and leverages AI when relevant for formatting.
+* **Modular**: Easy to adapt for other cities or other messaging platforms (Telegram, Slack, etc.).
+
+---
+
+## 🔧 Prerequisites
+
+* An **n8n** instance (Cloud or self-hosted).
+* The specific credentials mentioned in the README of each folder.
