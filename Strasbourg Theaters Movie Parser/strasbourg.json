@@ -45,19 +45,6 @@
     },
     {
       "parameters": {
-        "jsCode": "const baseUrl = \"https://www.allocine.fr/_/showtimes/theater-P0600/d-\";\nconst formattedDate = $input.first().json['formatted-url']\nreturn [{\n  json: {\n    VoxURL: baseUrl + formattedDate\n  }\n}];\n"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        -240,
-        -128
-      ],
-      "id": "b4e92f7c-e509-42d3-8ab7-277b38610d99",
-      "name": "Vox Link Builder"
-    },
-    {
-      "parameters": {
         "rule": {
           "interval": [
             {
@@ -132,8 +119,8 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -368,
-        -256
+        -384,
+        288
       ],
       "typeVersion": 1,
       "id": "0105d230-d4cd-4633-b9e3-89bb334d19c2",
@@ -183,19 +170,6 @@
       ],
       "id": "5e1f14d0-e2ac-481a-a6db-d22edfd88967",
       "name": "Star Link Builder"
-    },
-    {
-      "parameters": {
-        "jsCode": "const baseUrl = \"https://www.allocine.fr/_/showtimes/theater-P0025/d-\";\nconst formattedDate = $input.first().json['formatted-url']\nreturn [{\n  json: {\n    UGCUrl: baseUrl + formattedDate\n  }\n}];\n"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        112,
-        -128
-      ],
-      "id": "f4746823-9e7e-4c26-b7a2-35703bef6ca5",
-      "name": "Star SE Link Builder"
     },
     {
       "parameters": {
@@ -434,6 +408,112 @@
       "id": "2ee973d8-72e7-409b-9c7e-fdce1ea93a59",
       "name": "AI Message Writter Agent ",
       "executeOnce": false
+    },
+    {
+      "parameters": {
+        "content": "## UGC",
+        "height": 464,
+        "width": 166,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -624,
+        -192
+      ],
+      "typeVersion": 1,
+      "id": "83651ca5-d638-4696-91da-b8eef9bfcc6b",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## Cosmos",
+        "height": 464,
+        "width": 166,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -448,
+        -192
+      ],
+      "typeVersion": 1,
+      "id": "38adfa3d-1160-4868-926b-66edceb197f2",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## Vox",
+        "height": 464,
+        "width": 166,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -272,
+        -192
+      ],
+      "typeVersion": 1,
+      "id": "0e3e3ca2-7128-416c-a24e-ee7d8d512ce0",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "## Star",
+        "height": 464,
+        "width": 166,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -96,
+        -192
+      ],
+      "typeVersion": 1,
+      "id": "33265da0-87ae-4486-8a14-68a31bbaae02",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "## Star SE\n",
+        "height": 464,
+        "width": 166,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        80,
+        -192
+      ],
+      "typeVersion": 1,
+      "id": "22c8e883-d41b-4d7b-b03a-4bb9057f711d",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "jsCode": "const baseUrl = \"https://www.allocine.fr/_/showtimes/theater-P0025/d-\";\nconst formattedDate = $input.first().json['formatted-url']\nreturn [{\n  json: {\n    UGCUrl: baseUrl + formattedDate\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        112,
+        -128
+      ],
+      "id": "f4746823-9e7e-4c26-b7a2-35703bef6ca5",
+      "name": "Star SE Link Builder"
+    },
+    {
+      "parameters": {
+        "jsCode": "const baseUrl = \"https://www.allocine.fr/_/showtimes/theater-P0600/d-\";\nconst formattedDate = $input.first().json['formatted-url']\nreturn [{\n  json: {\n    VoxURL: baseUrl + formattedDate\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -240,
+        -128
+      ],
+      "id": "b4e92f7c-e509-42d3-8ab7-277b38610d99",
+      "name": "Vox Link Builder"
     }
   ],
   "connections": {
@@ -451,17 +531,17 @@
             "index": 0
           },
           {
-            "node": "Vox Link Builder",
-            "type": "main",
-            "index": 0
-          },
-          {
             "node": "Star Link Builder",
             "type": "main",
             "index": 0
           },
           {
             "node": "Star SE Link Builder",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Vox Link Builder",
             "type": "main",
             "index": 0
           }
@@ -484,17 +564,6 @@
         [
           {
             "node": "Cosmos Request",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Vox Link Builder": {
-      "main": [
-        [
-          {
-            "node": "Vox Request",
             "type": "main",
             "index": 0
           }
@@ -539,17 +608,6 @@
         [
           {
             "node": "Star Request",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Star SE Link Builder": {
-      "main": [
-        [
-          {
-            "node": "Star SE Request",
             "type": "main",
             "index": 0
           }
@@ -720,6 +778,28 @@
         [
           {
             "node": "Message Splitter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Star SE Link Builder": {
+      "main": [
+        [
+          {
+            "node": "Star SE Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vox Link Builder": {
+      "main": [
+        [
+          {
+            "node": "Vox Request",
             "type": "main",
             "index": 0
           }
