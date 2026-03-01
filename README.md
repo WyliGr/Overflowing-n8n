@@ -28,9 +28,11 @@ To use any of these workflows in your n8n instance:
 
 ## 🤖 Why use these workflows?
 
-* **Ready to use**: No need to rebuild the logic from scratch.
-* **Optimized**: Uses minimal JavaScript code and leverages AI when relevant for formatting.
-* **Modular**: Easy to adapt for other cities or other messaging platforms (Telegram, Slack, etc.).
+Good question! Honestly, use them at your own risk, brother. I'm no automation guru or AI wizard—I'm just messing around with nodes to build stuff that seems cool and useful. 
+
+I decided to share these because I think they might help someone else out, which is exactly why this repo is released under the **GLWTPL** (Good Luck With That Public License). I can't promise my shit is perfectly stable, and I am absolutely not responsible for any chaos or damages these workflows might cause in your setup. 
+
+Play around, tweak them, and good luck!
 
 ---
 
