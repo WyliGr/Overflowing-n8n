@@ -124,7 +124,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const results = $input.first().json.results || [];\nconst nomDuCinema = \"UGC Ciné Cité\"; // À changer en \"Vox\" ou \"Le Cosmos\" selon le nœud\n\nconst simplifiedData = results\n  .filter(item => item.showtimes?.multiple?.length > 0) // On vire les films sans séances\n  .map(item => {\n    return {\n      titre: item.movie.title,\n      duree: item.movie.runtime,\n      horaires: item.showtimes.multiple.map(s => {\n        const date = new Date(s.startsAt);\n        return date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });\n      }).join(' | ')\n    };\n  });\n\nreturn [{ json: { cinema: nomDuCinema, films: simplifiedData } }];"
+        "jsCode": "const results = $input.first().json.results || [];\nconst nomDuCinema = \"UGC Ciné Cité\"; // À adapter (Vox ou Le Cosmos)\n\nconst simplifiedData = results.map(item => {\n  const st = item.showtimes;\n  if (!st) return null;\n\n  let allShowtimes = [];\n\n  // On itère sur toutes les clés de l'objet showtimes (original, multiple, original_st, etc.)\n  Object.keys(st).forEach(key => {\n    const list = st[key];\n    if (Array.isArray(list)) {\n      list.forEach(s => {\n        const date = new Date(s.startsAt);\n        const heure = date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });\n        \n        // Détermination intelligente de la version\n        let version = \"VF\";\n        if (s.diffusionVersion === \"ORIGINAL\") version = \"VOST\";\n        \n        // Ajout d'options (ex: Avant-première)\n        let extra = s.isPreview ? \" [AP]\" : \"\";\n        \n        allShowtimes.push({\n          time: heure,\n          label: `${heure} (${version}${extra})`,\n          rawTime: s.startsAt\n        });\n      });\n    }\n  });\n\n  // Tri par horaire\n  allShowtimes.sort((a, b) => a.rawTime.localeCompare(b.rawTime));\n\n  return {\n    titre: item.movie.title,\n    duree: item.movie.runtime,\n    horaires: allShowtimes.map(s => s.label).join(' | ')\n  };\n}).filter(film => film && film.horaires.length > 0);\n\nreturn [{ json: { cinema: nomDuCinema, films: simplifiedData } }];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -137,7 +137,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const results = $input.first().json.results || [];\nconst nomDuCinema = \"Le Cosmos\"; // À changer en \"Vox\" ou \"Le Cosmos\" selon le nœud\n\nconst simplifiedData = results\n  .filter(item => item.showtimes?.multiple?.length > 0) // On vire les films sans séances\n  .map(item => {\n    return {\n      titre: item.movie.title,\n      duree: item.movie.runtime,\n      horaires: item.showtimes.multiple.map(s => {\n        const date = new Date(s.startsAt);\n        return date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });\n      }).join(' | ')\n    };\n  });\n\nreturn [{ json: { cinema: nomDuCinema, films: simplifiedData } }];"
+        "jsCode": "const results = $input.first().json.results || [];\nconst nomDuCinema = \"Le Cosmos\"; // À adapter (Vox ou Le Cosmos)\n\nconst simplifiedData = results.map(item => {\n  const st = item.showtimes;\n  if (!st) return null;\n\n  let allShowtimes = [];\n\n  // On itère sur toutes les clés de l'objet showtimes (original, multiple, original_st, etc.)\n  Object.keys(st).forEach(key => {\n    const list = st[key];\n    if (Array.isArray(list)) {\n      list.forEach(s => {\n        const date = new Date(s.startsAt);\n        const heure = date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });\n        \n        // Détermination intelligente de la version\n        let version = \"VF\";\n        if (s.diffusionVersion === \"ORIGINAL\") version = \"VOST\";\n        \n        // Ajout d'options (ex: Avant-première)\n        let extra = s.isPreview ? \" [AP]\" : \"\";\n        \n        allShowtimes.push({\n          time: heure,\n          label: `${heure} (${version}${extra})`,\n          rawTime: s.startsAt\n        });\n      });\n    }\n  });\n\n  // Tri par horaire\n  allShowtimes.sort((a, b) => a.rawTime.localeCompare(b.rawTime));\n\n  return {\n    titre: item.movie.title,\n    duree: item.movie.runtime,\n    horaires: allShowtimes.map(s => s.label).join(' | ')\n  };\n}).filter(film => film && film.horaires.length > 0);\n\nreturn [{ json: { cinema: nomDuCinema, films: simplifiedData } }];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -150,7 +150,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const results = $input.first().json.results || [];\nconst nomDuCinema = \"Vox\"; // À changer en \"Vox\" ou \"Le Cosmos\" selon le nœud\n\nconst simplifiedData = results\n  .filter(item => item.showtimes?.multiple?.length > 0) // On vire les films sans séances\n  .map(item => {\n    return {\n      titre: item.movie.title,\n      duree: item.movie.runtime,\n      horaires: item.showtimes.multiple.map(s => {\n        const date = new Date(s.startsAt);\n        return date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });\n      }).join(' | ')\n    };\n  });\n\nreturn [{ json: { cinema: nomDuCinema, films: simplifiedData } }];"
+        "jsCode": "const results = $input.first().json.results || [];\nconst nomDuCinema = \"Vox\"; // À adapter (Vox ou Le Cosmos)\n\nconst simplifiedData = results.map(item => {\n  const st = item.showtimes;\n  if (!st) return null;\n\n  let allShowtimes = [];\n\n  // On itère sur toutes les clés de l'objet showtimes (original, multiple, original_st, etc.)\n  Object.keys(st).forEach(key => {\n    const list = st[key];\n    if (Array.isArray(list)) {\n      list.forEach(s => {\n        const date = new Date(s.startsAt);\n        const heure = date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });\n        \n        // Détermination intelligente de la version\n        let version = \"VF\";\n        if (s.diffusionVersion === \"ORIGINAL\") version = \"VOST\";\n        \n        // Ajout d'options (ex: Avant-première)\n        let extra = s.isPreview ? \" [AP]\" : \"\";\n        \n        allShowtimes.push({\n          time: heure,\n          label: `${heure} (${version}${extra})`,\n          rawTime: s.startsAt\n        });\n      });\n    }\n  });\n\n  // Tri par horaire\n  allShowtimes.sort((a, b) => a.rawTime.localeCompare(b.rawTime));\n\n  return {\n    titre: item.movie.title,\n    duree: item.movie.runtime,\n    horaires: allShowtimes.map(s => s.label).join(' | ')\n  };\n}).filter(film => film && film.horaires.length > 0);\n\nreturn [{ json: { cinema: nomDuCinema, films: simplifiedData } }];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -219,7 +219,7 @@
       "type": "n8n-nodes-base.discord",
       "typeVersion": 2,
       "position": [
-        368,
+        512,
         112
       ],
       "id": "be5e616a-b8c7-463a-9413-e210ede85202",
@@ -278,6 +278,82 @@
       ],
       "id": "f0770916-890e-4ed3-9cd5-965b90b9d0e4",
       "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "const fullText = $input.first().json.output; // On récupère l'output de l'IA\nconst limit = 1900; // Limite Discord (2000) avec une marge\nconst chunks = [];\nlet currentChunk = \"\";\n\n// On découpe le texte par bloc de film (séparés par un double saut de ligne)\nconst blocks = fullText.split(/\\n(?=\\*\\*)/); \n\nfor (const block of blocks) {\n  if ((currentChunk + block).length > limit) {\n    chunks.push({ json: { output: currentChunk.trim() } });\n    currentChunk = block;\n  } else {\n    currentChunk += \"\\n\" + block;\n  }\n}\n\nif (currentChunk.trim().length > 0) {\n  chunks.push({ json: { output: currentChunk.trim() } });\n}\n\nreturn chunks;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        352,
+        112
+      ],
+      "id": "a807ffea-b73c-4ac6-b3e6-0fb3d630c3f9",
+      "name": "Message Splitter"
+    },
+    {
+      "parameters": {
+        "content": "Sur ces deux nodes *time* on fetch et formatte la date du jour pour **YYY-MM-DD**",
+        "height": 80,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -928,
+        -176
+      ],
+      "typeVersion": 1,
+      "id": "1469697f-eaa2-49da-974f-cdd985474507",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "Ces nodes ici (*une branche par cinéma*) crée l'URL pour l'API **Allociné** de chaque cinéma avec la date du jour, fetch les scéances et les formatte dans un joli **JSON simplifié**",
+        "height": 80,
+        "width": 416,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -672,
+        304
+      ],
+      "typeVersion": 1,
+      "id": "0105d230-d4cd-4633-b9e3-89bb334d19c2",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "Ici, on **fusionne** les JSON de tout les cinémas qui ont été fetch dans un seul **JSON**",
+        "height": 80,
+        "width": 288,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -112,
+        -224
+      ],
+      "typeVersion": 1,
+      "id": "aaf01f7a-cc3d-4da9-b0b1-27ced42ead3f",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "On envoie ensuite tout a un **Agent IA** qui va transformer le **JSON** en message *Human-readable* que l'on va découper s'il est trop long puis envoyer sur le channel **Discord** en question.",
+        "height": 96,
+        "width": 416,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        240,
+        -16
+      ],
+      "typeVersion": 1,
+      "id": "9339f7dc-343e-4c2f-a88c-a6969541a07a",
+      "name": "Sticky Note3"
     }
   ],
   "connections": {
@@ -438,11 +514,16 @@
       "main": [
         [
           {
-            "node": "Send a message",
+            "node": "Message Splitter",
             "type": "main",
             "index": 0
           }
         ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        []
       ]
     },
     "Mistral Cloud Chat Model": {
@@ -472,6 +553,17 @@
         [
           {
             "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message Splitter": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
             "type": "main",
             "index": 0
           }
