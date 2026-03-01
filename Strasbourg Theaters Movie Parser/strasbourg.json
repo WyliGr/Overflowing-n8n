@@ -7,8 +7,8 @@
       "type": "n8n-nodes-base.dateTime",
       "typeVersion": 2,
       "position": [
-        -864,
-        -64
+        -992,
+        304
       ],
       "id": "81cfcb91-6f5f-4eb7-b8d6-daf5372b208f",
       "name": "Date & Time"
@@ -24,8 +24,8 @@
       "type": "n8n-nodes-base.dateTime",
       "typeVersion": 2,
       "position": [
-        -864,
-        160
+        -848,
+        304
       ],
       "id": "abb4c342-73d0-46bf-ac94-1607c4d96fe7",
       "name": "Formating"
@@ -50,7 +50,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -624,
+        -592,
         16
       ],
       "id": "2fdfa00a-33f3-4a75-8397-45491fcc4ce4",
@@ -63,7 +63,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -656,
+        -592,
         160
       ],
       "id": "b4e92f7c-e509-42d3-8ab7-277b38610d99",
@@ -91,7 +91,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -480,
+        -448,
         16
       ],
       "id": "ab893038-48b9-48f2-acf3-36d0d860b4c8",
@@ -105,7 +105,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -512,
+        -448,
         160
       ],
       "id": "cac5b062-410d-4afc-8a80-541acd797789",
@@ -116,15 +116,15 @@
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        -1072,
-        112
+        -1168,
+        304
       ],
       "id": "d7834147-ed53-44bf-beaa-fd9d80625a3f",
       "name": "When clicking ‘Execute workflow’"
     },
     {
       "parameters": {
-        "jsCode": "const results = $input.first().json.results || [];\nconst nomDuCinema = \"UGC Ciné Cité\"; // À adapter (Vox ou Le Cosmos)\n\nconst simplifiedData = results.map(item => {\n  const st = item.showtimes;\n  if (!st) return null;\n\n  let allShowtimes = [];\n\n  // On itère sur toutes les clés de l'objet showtimes (original, multiple, original_st, etc.)\n  Object.keys(st).forEach(key => {\n    const list = st[key];\n    if (Array.isArray(list)) {\n      list.forEach(s => {\n        const date = new Date(s.startsAt);\n        const heure = date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });\n        \n        // Détermination intelligente de la version\n        let version = \"VF\";\n        if (s.diffusionVersion === \"ORIGINAL\") version = \"VOST\";\n        \n        // Ajout d'options (ex: Avant-première)\n        let extra = s.isPreview ? \" [AP]\" : \"\";\n        \n        allShowtimes.push({\n          time: heure,\n          label: `${heure} (${version}${extra})`,\n          rawTime: s.startsAt\n        });\n      });\n    }\n  });\n\n  // Tri par horaire\n  allShowtimes.sort((a, b) => a.rawTime.localeCompare(b.rawTime));\n\n  return {\n    titre: item.movie.title,\n    duree: item.movie.runtime,\n    horaires: allShowtimes.map(s => s.label).join(' | ')\n  };\n}).filter(film => film && film.horaires.length > 0);\n\nreturn [{ json: { cinema: nomDuCinema, films: simplifiedData } }];"
+        "jsCode": "const results = $input.first().json.results || [];\nconst nomDuCinema = \"UGC Ciné Cité\"; // ⚠️ À MODIFIER pour chaque nœud (Vox, Le Cosmos, Star, etc.)\nconst now = new Date();\n\nconst simplifiedData = results.map(item => {\n  const st = item.showtimes;\n  if (!st) return null;\n\n  let allShowtimes = [];\n\n  // Parcourt toutes les listes de séances (original, dubbed, multiple...)\n  Object.keys(st).forEach(key => {\n    const list = st[key];\n    if (Array.isArray(list)) {\n      list.forEach(s => {\n        const date = new Date(s.startsAt);\n        \n        // OPTIONNEL : Retire cette ligne si tu veux voir TOUTES les séances de la journée\n        if (date < now) return; \n\n        const heure = date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });\n        \n        // LOGIQUE DE VERSION : \n        // On n'affiche (VOST) que si la version est \"ORIGINAL\"\n        // Si c'est de la VF (DUBBED), on laisse vide.\n        let versionLabel = \"\";\n        if (s.diffusionVersion === \"ORIGINAL\") {\n          versionLabel = \" (VOST)\";\n        }\n        \n        // Ajout du tag AP pour les avant-premières\n        let extra = s.isPreview ? \" [AP]\" : \"\";\n        \n        allShowtimes.push({\n          time: heure,\n          label: `\\`${heure}\\`${versionLabel}${extra}`,\n          rawTime: s.startsAt\n        });\n      });\n    }\n  });\n\n  // Si après filtrage il n'y a plus de séances pour ce film, on l'ignore\n  if (allShowtimes.length === 0) return null;\n\n  // Tri des séances par heure\n  allShowtimes.sort((a, b) => a.rawTime.localeCompare(b.rawTime));\n\n  return {\n    titre: item.movie.title.toUpperCase().replace(/[\"«»]/g, '').trim(),\n    duree: item.movie.runtime,\n    horaires: allShowtimes.map(s => s.label).join(' ')\n  };\n}).filter(film => film !== null);\n\nreturn [{ json: { cinema: nomDuCinema, films: simplifiedData } }];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -137,12 +137,12 @@
     },
     {
       "parameters": {
-        "jsCode": "const results = $input.first().json.results || [];\nconst nomDuCinema = \"Le Cosmos\"; // À adapter (Vox ou Le Cosmos)\n\nconst simplifiedData = results.map(item => {\n  const st = item.showtimes;\n  if (!st) return null;\n\n  let allShowtimes = [];\n\n  // On itère sur toutes les clés de l'objet showtimes (original, multiple, original_st, etc.)\n  Object.keys(st).forEach(key => {\n    const list = st[key];\n    if (Array.isArray(list)) {\n      list.forEach(s => {\n        const date = new Date(s.startsAt);\n        const heure = date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });\n        \n        // Détermination intelligente de la version\n        let version = \"VF\";\n        if (s.diffusionVersion === \"ORIGINAL\") version = \"VOST\";\n        \n        // Ajout d'options (ex: Avant-première)\n        let extra = s.isPreview ? \" [AP]\" : \"\";\n        \n        allShowtimes.push({\n          time: heure,\n          label: `${heure} (${version}${extra})`,\n          rawTime: s.startsAt\n        });\n      });\n    }\n  });\n\n  // Tri par horaire\n  allShowtimes.sort((a, b) => a.rawTime.localeCompare(b.rawTime));\n\n  return {\n    titre: item.movie.title,\n    duree: item.movie.runtime,\n    horaires: allShowtimes.map(s => s.label).join(' | ')\n  };\n}).filter(film => film && film.horaires.length > 0);\n\nreturn [{ json: { cinema: nomDuCinema, films: simplifiedData } }];"
+        "jsCode": "const results = $input.first().json.results || [];\nconst nomDuCinema = \"Le Cosmos\"; // ⚠️ À MODIFIER pour chaque nœud (Vox, Le Cosmos, Star, etc.)\nconst now = new Date();\n\nconst simplifiedData = results.map(item => {\n  const st = item.showtimes;\n  if (!st) return null;\n\n  let allShowtimes = [];\n\n  // Parcourt toutes les listes de séances (original, dubbed, multiple...)\n  Object.keys(st).forEach(key => {\n    const list = st[key];\n    if (Array.isArray(list)) {\n      list.forEach(s => {\n        const date = new Date(s.startsAt);\n        \n        // OPTIONNEL : Retire cette ligne si tu veux voir TOUTES les séances de la journée\n        if (date < now) return; \n\n        const heure = date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });\n        \n        // LOGIQUE DE VERSION : \n        // On n'affiche (VOST) que si la version est \"ORIGINAL\"\n        // Si c'est de la VF (DUBBED), on laisse vide.\n        let versionLabel = \"\";\n        if (s.diffusionVersion === \"ORIGINAL\") {\n          versionLabel = \" (VOST)\";\n        }\n        \n        // Ajout du tag AP pour les avant-premières\n        let extra = s.isPreview ? \" [AP]\" : \"\";\n        \n        allShowtimes.push({\n          time: heure,\n          label: `\\`${heure}\\`${versionLabel}${extra}`,\n          rawTime: s.startsAt\n        });\n      });\n    }\n  });\n\n  // Si après filtrage il n'y a plus de séances pour ce film, on l'ignore\n  if (allShowtimes.length === 0) return null;\n\n  // Tri des séances par heure\n  allShowtimes.sort((a, b) => a.rawTime.localeCompare(b.rawTime));\n\n  return {\n    titre: item.movie.title.toUpperCase().replace(/[\"«»]/g, '').trim(),\n    duree: item.movie.runtime,\n    horaires: allShowtimes.map(s => s.label).join(' ')\n  };\n}).filter(film => film !== null);\n\nreturn [{ json: { cinema: nomDuCinema, films: simplifiedData } }];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -336,
+        -304,
         16
       ],
       "id": "97e96b19-866c-4e11-b9a2-c650bdd6531b",
@@ -150,12 +150,12 @@
     },
     {
       "parameters": {
-        "jsCode": "const results = $input.first().json.results || [];\nconst nomDuCinema = \"Vox\"; // À adapter (Vox ou Le Cosmos)\n\nconst simplifiedData = results.map(item => {\n  const st = item.showtimes;\n  if (!st) return null;\n\n  let allShowtimes = [];\n\n  // On itère sur toutes les clés de l'objet showtimes (original, multiple, original_st, etc.)\n  Object.keys(st).forEach(key => {\n    const list = st[key];\n    if (Array.isArray(list)) {\n      list.forEach(s => {\n        const date = new Date(s.startsAt);\n        const heure = date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });\n        \n        // Détermination intelligente de la version\n        let version = \"VF\";\n        if (s.diffusionVersion === \"ORIGINAL\") version = \"VOST\";\n        \n        // Ajout d'options (ex: Avant-première)\n        let extra = s.isPreview ? \" [AP]\" : \"\";\n        \n        allShowtimes.push({\n          time: heure,\n          label: `${heure} (${version}${extra})`,\n          rawTime: s.startsAt\n        });\n      });\n    }\n  });\n\n  // Tri par horaire\n  allShowtimes.sort((a, b) => a.rawTime.localeCompare(b.rawTime));\n\n  return {\n    titre: item.movie.title,\n    duree: item.movie.runtime,\n    horaires: allShowtimes.map(s => s.label).join(' | ')\n  };\n}).filter(film => film && film.horaires.length > 0);\n\nreturn [{ json: { cinema: nomDuCinema, films: simplifiedData } }];"
+        "jsCode": "const results = $input.first().json.results || [];\nconst nomDuCinema = \"Vox\"; // ⚠️ À MODIFIER pour chaque nœud (Vox, Le Cosmos, Star, etc.)\nconst now = new Date();\n\nconst simplifiedData = results.map(item => {\n  const st = item.showtimes;\n  if (!st) return null;\n\n  let allShowtimes = [];\n\n  // Parcourt toutes les listes de séances (original, dubbed, multiple...)\n  Object.keys(st).forEach(key => {\n    const list = st[key];\n    if (Array.isArray(list)) {\n      list.forEach(s => {\n        const date = new Date(s.startsAt);\n        \n        // OPTIONNEL : Retire cette ligne si tu veux voir TOUTES les séances de la journée\n        if (date < now) return; \n\n        const heure = date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });\n        \n        // LOGIQUE DE VERSION : \n        // On n'affiche (VOST) que si la version est \"ORIGINAL\"\n        // Si c'est de la VF (DUBBED), on laisse vide.\n        let versionLabel = \"\";\n        if (s.diffusionVersion === \"ORIGINAL\") {\n          versionLabel = \" (VOST)\";\n        }\n        \n        // Ajout du tag AP pour les avant-premières\n        let extra = s.isPreview ? \" [AP]\" : \"\";\n        \n        allShowtimes.push({\n          time: heure,\n          label: `\\`${heure}\\`${versionLabel}${extra}`,\n          rawTime: s.startsAt\n        });\n      });\n    }\n  });\n\n  // Si après filtrage il n'y a plus de séances pour ce film, on l'ignore\n  if (allShowtimes.length === 0) return null;\n\n  // Tri des séances par heure\n  allShowtimes.sort((a, b) => a.rawTime.localeCompare(b.rawTime));\n\n  return {\n    titre: item.movie.title.toUpperCase().replace(/[\"«»]/g, '').trim(),\n    duree: item.movie.runtime,\n    horaires: allShowtimes.map(s => s.label).join(' ')\n  };\n}).filter(film => film !== null);\n\nreturn [{ json: { cinema: nomDuCinema, films: simplifiedData } }];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -368,
+        -304,
         160
       ],
       "id": "83dfc4ce-f303-48c9-a0c4-9064000c9566",
@@ -174,8 +174,8 @@
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.3,
       "position": [
-        -1072,
-        -64
+        -1168,
+        176
       ],
       "id": "d98148c6-bcd1-4288-9fd5-bb309f52efda",
       "name": "Schedule Trigger"
@@ -183,14 +183,14 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "=Tu es un bot Discord minimaliste. Ta mission est de mettre en forme la liste de films suivante de manière compacte et élégante : {{ JSON.stringify($json.liste_films) }}\n\n### CONSIGNE DE FORMATAGE STRICTE :\n\nPour chaque film avec une scéance aujourd'hui, utilise exactement ce schéma :\n\n**TITRE DU FILM** (Durée)\n• **Vox** : Horaires\n• **UGC** : Horaires\n• **Le Cosmos** : Horaires\n\n---\n\n### RÈGLES DE STYLE :\n1. N'affiche QUE les cinémas qui ont des séances (si c'est \"Pas de séance\", supprime la ligne).\n2. N'utilise PAS de titres de section (type ###) ou de séparateurs horizontaux (---).\n3. Utilise une puce simple (•) pour les cinémas.\n4. Écris le titre du film en GRAS et MAJUSCULES.\n5. AUCUNE introduction, AUCUNE conclusion. Juste les films.\n6. Tu as le droit aux emojis, sans abus, reste minimaliste.\n7. Au début de CHAQUE message, mets un GRAND TITRE avec la date pour séparer le message actuel et le message du jour précédent.\n8. N'écris RIEN D'AUTRE que le message discord. RIEN",
+        "text": "=Tu es un bot Discord minimaliste. Ta mission est de mettre en forme la liste de films suivante de manière compacte et élégante : {{ JSON.stringify($json.liste_films) }}\n\n### CONSIGNE DE FORMATAGE STRICTE :\n\nPour chaque film avec une scéance aujourd'hui, utilise exactement ce schéma :\n\n**TITRE DU FILM** (Durée)\n• **Vox** : Horaires\n• **UGC** : Horaires\n• **Le Cosmos** : Horaires\n\n---\n\n### RÈGLES DE STYLE :\n1. N'affiche QUE les cinémas qui ont des séances (si c'est \"Pas de séance\", supprime la ligne).\n2. N'utilise PAS de titres de section (type ###) ou de séparateurs horizontaux (---).\n3. Utilise une puce simple (•) pour les cinémas.\n4. Écris le titre du film en GRAS et MAJUSCULES.\n5. AUCUNE introduction, AUCUNE conclusion. Juste les films.\n6. Tu as le droit aux emojis, sans abus, reste minimaliste.\n7. Au début de CHAQUE message, mets un GRAND TITRE avec la date pour séparer le message actuel et le message du jour précédent.\n8. N'écris RIEN D'AUTRE que le message discord. RIEN\n9. Pour chaque cinéma, affiche les horaires sur une seule ligne. Si un film est présent dans plusieurs cinémas, essaie de faire tenir les puces (•) sur le moins de lignes possible",
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        80,
-        112
+        -80,
+        176
       ],
       "id": "2ee973d8-72e7-409b-9c7e-fdce1ea93a59",
       "name": "AI Agent",
@@ -219,8 +219,8 @@
       "type": "n8n-nodes-base.discord",
       "typeVersion": 2,
       "position": [
-        512,
-        112
+        400,
+        176
       ],
       "id": "be5e616a-b8c7-463a-9413-e210ede85202",
       "name": "Send a message",
@@ -241,8 +241,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
       "typeVersion": 1,
       "position": [
-        -128,
-        128
+        -80,
+        352
       ],
       "id": "bdc5a014-d6d2-4b53-964a-a738f6d97c56",
       "name": "Mistral Cloud Chat Model",
@@ -255,20 +255,20 @@
     },
     {
       "parameters": {
-        "jsCode": "const allInputs = $input.all();\nconst moviesMap = {};\n\nallInputs.forEach(input => {\n  const cinemaName = input.json.cinema;\n  const films = input.json.films || [];\n\n  films.forEach(film => {\n    const title = film.titre;\n    \n    if (!moviesMap[title]) {\n      moviesMap[title] = {\n        titre: title,\n        duree: film.duree,\n        seances: { \"Vox\": \"Pas de séance\", \"UGC\": \"Pas de séance\", \"Cosmos\": \"Pas de séance\" }\n      };\n    }\n    \n    // On remplit le bon cinéma (petit check sur le nom)\n    if (cinemaName.includes(\"Vox\")) moviesMap[title].seances[\"Vox\"] = film.horaires;\n    if (cinemaName.includes(\"UGC\")) moviesMap[title].seances[\"UGC\"] = film.horaires;\n    if (cinemaName.includes(\"Cosmos\")) moviesMap[title].seances[\"Cosmos\"] = film.horaires;\n  });\n});\n\nreturn [{ json: { liste_films: Object.values(moviesMap) } }];"
+        "jsCode": "const allInputs = $input.all();\nconst moviesMap = {};\n\nallInputs.forEach(input => {\n  const cinemaName = input.json.cinema;\n  const films = input.json.films || [];\n\n  films.forEach(film => {\n    // Nettoyage du titre (MAJUSCULES + retrait des guillemets parasites)\n    const title = film.titre.toUpperCase().replace(/[\"«»]/g, '').trim();\n    \n    if (!moviesMap[title]) {\n      moviesMap[title] = {\n        titre: title,\n        duree: film.duree,\n        seances: {} // On utilise un objet vide pour ne garder que les cinés avec séances\n      };\n    }\n    \n    // On mappe le nom du cinéma proprement\n    let key = \"UGC\";\n    if (cinemaName.includes(\"Vox\")) key = \"Vox\";\n    if (cinemaName.includes(\"Cosmos\")) key = \"Le Cosmos\";\n    if (cinemaName.includes(\"Star SE\")) key = \"Star SE\";\n    else if (cinemaName.includes(\"Star\")) key = \"Star\";\n\n    moviesMap[title].seances[key] = film.horaires;\n  });\n});\n\n// Tri alphabétique des films par titre avant l'envoi\nconst sortedMovies = Object.values(moviesMap).sort((a, b) => a.titre.localeCompare(b.titre));\n\nreturn [{ json: { liste_films: sortedMovies } }];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        48,
-        -96
+        128,
+        -64
       ],
       "id": "98a47d98-859f-4c6f-8cbc-b8b2563e88c0",
       "name": "Code in JavaScript"
     },
     {
       "parameters": {
-        "numberInputs": 3
+        "numberInputs": 5
       },
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
@@ -286,8 +286,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        352,
-        112
+        224,
+        176
       ],
       "id": "a807ffea-b73c-4ac6-b3e6-0fb3d630c3f9",
       "name": "Message Splitter"
@@ -300,8 +300,8 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -928,
-        -176
+        -992,
+        176
       ],
       "typeVersion": 1,
       "id": "1469697f-eaa2-49da-974f-cdd985474507",
@@ -316,8 +316,8 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -672,
-        304
+        -592,
+        -256
       ],
       "typeVersion": 1,
       "id": "0105d230-d4cd-4633-b9e3-89bb334d19c2",
@@ -332,8 +332,8 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -112,
-        -224
+        -96,
+        -240
       ],
       "typeVersion": 1,
       "id": "aaf01f7a-cc3d-4da9-b0b1-27ced42ead3f",
@@ -348,12 +348,92 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        240,
-        -16
+        304,
+        16
       ],
       "typeVersion": 1,
       "id": "9339f7dc-343e-4c2f-a88c-a6969541a07a",
       "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.UGCUrl }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -448,
+        304
+      ],
+      "id": "32e03f58-e9fd-4b09-9e2b-1c66009d155f",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "jsCode": "const results = $input.first().json.results || [];\nconst nomDuCinema = \"Star\"; // ⚠️ À MODIFIER pour chaque nœud (Vox, Le Cosmos, Star, etc.)\nconst now = new Date();\n\nconst simplifiedData = results.map(item => {\n  const st = item.showtimes;\n  if (!st) return null;\n\n  let allShowtimes = [];\n\n  // Parcourt toutes les listes de séances (original, dubbed, multiple...)\n  Object.keys(st).forEach(key => {\n    const list = st[key];\n    if (Array.isArray(list)) {\n      list.forEach(s => {\n        const date = new Date(s.startsAt);\n        \n        // OPTIONNEL : Retire cette ligne si tu veux voir TOUTES les séances de la journée\n        if (date < now) return; \n\n        const heure = date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });\n        \n        // LOGIQUE DE VERSION : \n        // On n'affiche (VOST) que si la version est \"ORIGINAL\"\n        // Si c'est de la VF (DUBBED), on laisse vide.\n        let versionLabel = \"\";\n        if (s.diffusionVersion === \"ORIGINAL\") {\n          versionLabel = \" (VOST)\";\n        }\n        \n        // Ajout du tag AP pour les avant-premières\n        let extra = s.isPreview ? \" [AP]\" : \"\";\n        \n        allShowtimes.push({\n          time: heure,\n          label: `\\`${heure}\\`${versionLabel}${extra}`,\n          rawTime: s.startsAt\n        });\n      });\n    }\n  });\n\n  // Si après filtrage il n'y a plus de séances pour ce film, on l'ignore\n  if (allShowtimes.length === 0) return null;\n\n  // Tri des séances par heure\n  allShowtimes.sort((a, b) => a.rawTime.localeCompare(b.rawTime));\n\n  return {\n    titre: item.movie.title.toUpperCase().replace(/[\"«»]/g, '').trim(),\n    duree: item.movie.runtime,\n    horaires: allShowtimes.map(s => s.label).join(' ')\n  };\n}).filter(film => film !== null);\n\nreturn [{ json: { cinema: nomDuCinema, films: simplifiedData } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -304,
+        304
+      ],
+      "id": "cac9b95c-7b88-4109-90e5-b96cc9f96b71",
+      "name": "Simplify JSON3"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.UGCUrl }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -448,
+        448
+      ],
+      "id": "765d82a3-4e75-4a69-9950-849cc8fd421e",
+      "name": "HTTP Request4"
+    },
+    {
+      "parameters": {
+        "jsCode": "const results = $input.first().json.results || [];\nconst nomDuCinema = \"Star SE\"; // ⚠️ À MODIFIER pour chaque nœud (Vox, Le Cosmos, Star, etc.)\nconst now = new Date();\n\nconst simplifiedData = results.map(item => {\n  const st = item.showtimes;\n  if (!st) return null;\n\n  let allShowtimes = [];\n\n  // Parcourt toutes les listes de séances (original, dubbed, multiple...)\n  Object.keys(st).forEach(key => {\n    const list = st[key];\n    if (Array.isArray(list)) {\n      list.forEach(s => {\n        const date = new Date(s.startsAt);\n        \n        // OPTIONNEL : Retire cette ligne si tu veux voir TOUTES les séances de la journée\n        if (date < now) return; \n\n        const heure = date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });\n        \n        // LOGIQUE DE VERSION : \n        // On n'affiche (VOST) que si la version est \"ORIGINAL\"\n        // Si c'est de la VF (DUBBED), on laisse vide.\n        let versionLabel = \"\";\n        if (s.diffusionVersion === \"ORIGINAL\") {\n          versionLabel = \" (VOST)\";\n        }\n        \n        // Ajout du tag AP pour les avant-premières\n        let extra = s.isPreview ? \" [AP]\" : \"\";\n        \n        allShowtimes.push({\n          time: heure,\n          label: `\\`${heure}\\`${versionLabel}${extra}`,\n          rawTime: s.startsAt\n        });\n      });\n    }\n  });\n\n  // Si après filtrage il n'y a plus de séances pour ce film, on l'ignore\n  if (allShowtimes.length === 0) return null;\n\n  // Tri des séances par heure\n  allShowtimes.sort((a, b) => a.rawTime.localeCompare(b.rawTime));\n\n  return {\n    titre: item.movie.title.toUpperCase().replace(/[\"«»]/g, '').trim(),\n    duree: item.movie.runtime,\n    horaires: allShowtimes.map(s => s.label).join(' ')\n  };\n}).filter(film => film !== null);\n\nreturn [{ json: { cinema: nomDuCinema, films: simplifiedData } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -304,
+        448
+      ],
+      "id": "e4c245aa-7954-4e3e-9d3c-6eb8d6af31a8",
+      "name": "Simplify JSON4"
+    },
+    {
+      "parameters": {
+        "jsCode": "const baseUrl = \"https://www.allocine.fr/_/showtimes/theater-P0027/d-\";\nconst formattedDate = $input.first().json['formatted-url']\nreturn [{\n  json: {\n    UGCUrl: baseUrl + formattedDate\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -592,
+        304
+      ],
+      "id": "5e1f14d0-e2ac-481a-a6db-d22edfd88967",
+      "name": "Star Link Builder"
+    },
+    {
+      "parameters": {
+        "jsCode": "const baseUrl = \"https://www.allocine.fr/_/showtimes/theater-P0025/d-\";\nconst formattedDate = $input.first().json['formatted-url']\nreturn [{\n  json: {\n    UGCUrl: baseUrl + formattedDate\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -592,
+        448
+      ],
+      "id": "f4746823-9e7e-4c26-b7a2-35703bef6ca5",
+      "name": "Star SE Link Builder"
     }
   ],
   "connections": {
@@ -383,6 +463,16 @@
           },
           {
             "node": "Vox Link Builder",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Star Link Builder",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Star SE Link Builder",
             "type": "main",
             "index": 0
           }
@@ -564,6 +654,72 @@
         [
           {
             "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "Simplify JSON3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simplify JSON3": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "HTTP Request4": {
+      "main": [
+        [
+          {
+            "node": "Simplify JSON4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simplify JSON4": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "Star Link Builder": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Star SE Link Builder": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request4",
             "type": "main",
             "index": 0
           }
