@@ -32,10 +32,14 @@ Le workflow est pré-configuré pour les salles suivantes :
 * L'ID du salon Discord est déjà renseigné mais a modifier à votre convenance, assurez-vous que votre bot a les permissions d'écriture sur votre serveur.
 
 
-
 ## 📝 Exemple de rendu Discord
 
 > **DUNE: DEUXIÈME PARTIE** (2h46)<br>
 > • **Vox** : 14:00 (VO)| 20:30<br>
 > • **UGC** : 13:30 | 17:00 (VOSTFR)| 21:00<br>
 > • **Le Cosmos** : 18:15<br>
+
+## Webhook
+Il y a un *second workflow*, la version **webhook** qui permet d'utiliser ce workflow comme une *API*. On envoie une *requête GET*, ça execute mes nodes qui call l'API de Allociné puis ça renvoie le JSON clair, nettoyé et merge par film.
+
+Ce webhook a un usecase qui peut être important dans un projet comme [**Minuit.strs**](https://cinema.wyliam.fr) qui est la version web de ce Workflow. Au lieu de recevoir la data sur discord, tout est réuni sur un seul même dashboard web.
