@@ -40,6 +40,65 @@ Le workflow est pré-configuré pour les salles suivantes :
 > • **Le Cosmos** : 18:15<br>
 
 ## Webhook
-Il y a un *second workflow*, la version **webhook** qui permet d'utiliser ce workflow comme une *API*. On envoie une *requête GET*, ça execute mes nodes qui call l'API de Allociné puis ça renvoie le JSON clair, nettoyé et merge par film.
 
-Ce webhook a un usecase qui peut être important dans un projet comme [**Minuit.strs**](https://cinema.wyliam.fr) qui est la version web de ce Workflow. Au lieu de recevoir la data sur discord, tout est réuni sur un seul même dashboard web.
+Il y a un **second workflow** (`strasbourg-webhook.json`), la version **webhook** qui permet d'utiliser ce workflow comme une **API**.
+
+### Fonctionnement
+
+On envoie une requête GET avec un paramètre `days`, ça exécute les nodes qui appellent l'API Allociné puis ça renvoie le JSON clair, nettoyé et mergé par film.
+
+### Endpoint
+
+```
+GET https://n8n.wyligr.fr/webhook/api/ttheater?days={N}
+```
+
+- `days=0` → Aujourd'hui (par défaut)
+- `days=1` → Demain
+- `days=7` → Dans 7 jours
+
+### Exemples de requêtes
+
+```bash
+# Films d'aujourd'hui
+curl "https://n8n.wyligr.fr/webhook/api/ttheater"
+# ou
+curl "https://n8n.wyligr.fr/webhook/api/ttheater?days=0"
+
+# Films de demain
+curl "https://n8n.wyligr.fr/webhook/api/ttheater?days=1"
+
+# Films dans 3 jours
+curl "https://n8n.wyligr.fr/webhook/api/ttheater?days=3"
+
+# Avec POST
+curl -X POST "https://n8n.wyligr.fr/webhook/api/ttheater" \
+  -H "Content-Type: application/json" \
+  -d '{"days": 2}'
+```
+
+### Réponse
+
+```json
+{
+  "date": "2026-04-22",
+  "dayOffset": 2,
+  "displayDate": "mardi 22 avril",
+  "liste_films": [
+    {
+      "titre": "DUNE: DEUXIÈME PARTIE",
+      "duree": 166,
+      "seances": {
+        "UGC": [{"time": "20:30", "isVost": false}],
+        "Vox": [{"time": "21:00", "isVost": true}]
+      }
+    }
+  ]
+}
+```
+
+### Use case
+
+Ce webhook est utilisé par [**Minuit.strs**](https://cinema.wyliam.fr), la version web de ce workflow. Au lieu de recevoir la data sur Discord, tout est réuni sur un seul dashboard web.
+
+> **Note** : L'endpoint utilise `ttheater` (double t) pour éviter les collisions avec la version production.
